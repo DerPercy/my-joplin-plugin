@@ -1,3 +1,12 @@
+# Usefull Links:
+Getting started: https://joplinapp.org/api/get_started/plugins/
+
+Example project: https://github.com/roman-r-m/joplin-plugin-table-formatter
+
+Markdown It: https://github.com/markdown-it/markdown-it
+
+
+
 # Joplin Plugin
 
 This is a template to create a new Joplin plugin.
