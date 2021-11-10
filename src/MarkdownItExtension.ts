@@ -1,34 +1,81 @@
+//import { MyPlugin } from './MyPlugin.ts';
+
+
 module.exports = {
     default: function(context) {
         return {
             plugin: function(markdownIt, options) {
+							const contentScriptId = context.contentScriptId;
 
 								function render(tokens, idx, _options, env, self) {
-									console.log("render",tokens, idx, _options, env, self);
+
+									//console.log("render",tokens, idx, _options, env, self);
 
 									//return self.renderToken(tokens, idx, _options, env, self)
-									return "<div>Hello World</div>";
+									//MyPlugin.PluginClass.getInstance();
+									const uiOpt = btoa(JSON.stringify({
+										filterTag: "task",
+										columns: [
+											{ label: "Backlog"},
+											{ label: "Next", tag: "task.next" },
+											{ label: "Doing", tag: "task.doing" },
+											{ label: "Done", tag: "task.done" }
+										]
+									}));
+
+									const postMessageWithResponseTest = `
+						webviewApi.postMessage('${contentScriptId}', '${uiOpt}').then(function(response) {
+							console.info('Got response in Markdown-it content script: ' + response);
+							document.getElementById('abcdef1234').innerHTML = response;
+						});
+						return false;
+					`;
+					return `
+											<div style="padding:10px; border: 1px solid green;">
+												<p>Plugin active! Content: <p><pre>...</pre><p></p>
+												<div id="abcdef1234">The content here</div>
+												<p><a href="#" onclick="${postMessageWithResponseTest.replace(/\n/g, ' ')}">Click to post a message to plugin and check the response in the console</a></p>
+											</div>
+										`;
+
+
+
+								//	return MyPlugin.getHTMLCode();
 								}
 
 								function fence(state, startLine, endLine) {
-									console.log("fence",state,startLine,endLine);
+									//console.log("fence",state,startLine,endLine);
 
 									let iLineStart = state.bMarks[startLine] + state.tShift[startLine]
 									let iLineEnd = state.eMarks[startLine]
-									console.log("content",state.src.slice(iLineStart,iLineEnd));
+									let lineContent = state.src.slice(iLineStart,iLineEnd);
+									//console.log("content",lineContent);
+									if(lineContent !== '```myplugin'){
+										return false;
+									}
 
 
 
 									let pos = state.bMarks[startLine] + state.tShift[startLine]
 									//console.log(state.src.charCodeAt(pos),'`'.charCodeAt(0))
-									if(state.src.charCodeAt(pos) !== '`'.charCodeAt(0)){
+									/*if(state.src.charCodeAt(pos) !== '`'.charCodeAt(0)){
 										return false;
+									}*/
+
+									for(let i= startLine; i<= endLine; i++){
+										state.line = i+1;
+										let iNewLineStart = state.bMarks[i] + state.tShift[i];
+										let iNewLineEnd = state.eMarks[i];
+										let newLineContent = state.src.slice(iNewLineStart,iNewLineEnd);
+										if(newLineContent === '```'){
+											break;
+										}
 									}
 
 									let len = state.sCount[startLine]
 
 									let nextLine = startLine
-									state.line = nextLine + 1
+									//state.line = startLine+1
 
 									let token
 	 								//if (options.validate(params)) token = state.push(name, 'div', 0)
@@ -44,7 +91,7 @@ module.exports = {
 	 								return true
 									//return true;
 								}
-								console.log("Markdown it",markdownIt);
+								//console.log("Markdown it",markdownIt);
 
 
 								markdownIt.block.ruler.before('fence', 'myfence', fence, {

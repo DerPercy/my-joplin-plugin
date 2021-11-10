@@ -1,6 +1,7 @@
 {
 	"extraScripts": [
 		"CodeMirrorExtension.ts",
-		"MarkdownItExtension.ts"
+		"MarkdownItExtension.ts",
+		"MyPlugin.ts"
 	]
 }

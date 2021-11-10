@@ -1,4 +1,4 @@
-# Usefull Links:
+# Useful Links:
 Getting started: https://joplinapp.org/api/get_started/plugins/
 
 Example project: https://github.com/roman-r-m/joplin-plugin-table-formatter
