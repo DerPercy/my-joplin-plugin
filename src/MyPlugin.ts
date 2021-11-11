@@ -1,42 +1,67 @@
 import joplin from 'api';
+import { MyPluginMethods } from './MyPluginMethods';
 
 export module MyPlugin {
+
 	export async function getHTMLCode(options){
-		const folders = await joplin.data.get(['folders']);
-		console.log("Folders",folders);
-		const tags = await joplin.data.get(['tags']);
-		console.log("Tags",tags);
-
-		const notes = await joplin.data.get(['tags',"ecedf7d6250d48e4a81faeaa0da0e74a",'notes']);
-		console.log("Notes",notes);
 		let html = "";
-		html += "<table>";
-		html += "<tr>";
-		for(let col of options.columns){ // Header
-			html += "<th>"+col.label+"<br>("+col.tag+")</th>";
-		}
-		html += "</tr>";
-		html += "<tr>";
-		const matrix = buildMatrix(notes);
-		for(let col of matrix){ // Content
-			html += "<td>";
-			for(let note of col){
-				html += await renderNote(note);
-			}
-			html += "</td>";
-		}
-		html += "</tr>";
-		html += "</table>";
+		try{
+			const folders = await joplin.data.get(['folders']);
+			console.log("Folders",folders);
+			const tags = await joplin.data.get(['tags']);
+			console.log("Tags",tags);
 
-		return "<h1>This is my plugin :)-"+notes.items.length+"</h1>"+html;
+			const notes = await joplin.data.get(['tags',"ecedf7d6250d48e4a81faeaa0da0e74a",'notes']);
+			console.log("Notes",notes);
+
+			html += "<table>";
+			html += "<tr>";
+			for(let col of options.columns){ // Header
+				html += "<th>"+col.label+"<br>("+col.tag+")</th>";
+			}
+			html += "</tr>";
+			html += "<tr>";
+			const matrix = await buildMatrix(notes,options.columns);
+			for(let col of matrix){ // Content
+				html += "<td style='vertical-align:top'>";
+				for(let note of col){
+					//const noteTags = await joplin.data.get(['notes',note.id,'tags']);
+					//console.log("NoteTags",noteTags);
+					html += await renderNote(note);
+				}
+				html += "</td>";
+			}
+			html += "</tr>";
+			html += "</table>";
+		}catch(err){
+			console.error(err);
+			html = "Error:"+err;
+		}
+
+		return html;
 	}
 }
 
 /**
 returns [[{id:...},{},...],[...],...]
 */
-function buildMatrix(notes){
-	return [notes.items,[],[],[]];
+async function buildMatrix(notes,optColumns){
+	console.log("OC",optColumns);
+	let matrix = MyPluginMethods.initColumns(optColumns);
+	for(let note of notes.items){
+		console.log("Note",note);
+		const noteTags = await joplin.data.get(['notes',note.id,'tags']);
+		console.log("Tags",noteTags);
+		let colArray = MyPluginMethods.getNoteColumns(optColumns, noteTags.items);
+		console.log("Columns",colArray);
+
+		for(let colIndex of colArray){
+			matrix[colIndex].push(note);
+		}
+	}
+	console.log("Matrix:",matrix);
+	return matrix;
+	//return [notes.items,[],[],[]];
 }
 
 async function renderNote(note){

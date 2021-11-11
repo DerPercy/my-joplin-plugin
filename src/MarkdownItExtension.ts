@@ -19,6 +19,8 @@ module.exports = {
 											{ label: "Backlog"},
 											{ label: "Next", tag: "task.next" },
 											{ label: "Doing", tag: "task.doing" },
+											{ label: "In test", tag: "task.intest" },
+											{ label: "Wait", tag: "task.wait" },
 											{ label: "Done", tag: "task.done" }
 										]
 									}));
@@ -31,10 +33,9 @@ module.exports = {
 						return false;
 					`;
 					return `
-											<div style="padding:10px; border: 1px solid green;">
-												<p>Plugin active! Content: <p><pre>...</pre><p></p>
-												<div id="abcdef1234">The content here</div>
-												<p><a href="#" onclick="${postMessageWithResponseTest.replace(/\n/g, ' ')}">Click to post a message to plugin and check the response in the console</a></p>
+											<div>
+												<div id="abcdef1234"></div>
+												<p><a href="#" onclick="${postMessageWithResponseTest.replace(/\n/g, ' ')}">Read/Update</a></p>
 											</div>
 										`;
 
