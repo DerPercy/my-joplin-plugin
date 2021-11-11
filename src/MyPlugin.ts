@@ -9,9 +9,21 @@ export module MyPlugin {
 			const folders = await joplin.data.get(['folders']);
 			console.log("Folders",folders);
 			const tags = await joplin.data.get(['tags']);
-			console.log("Tags",tags);
+			if(!MyPluginMethods.isValidArray(MyPluginMethods.isValidTagObject,tags.items)){
+				return '<div>Tags in invalid format(E#15)</div>';
+			}
+			let tagid;
+			for(let tag of tags.items){
+				if(tag.title == options.filterTag){
+					tagid = tag.id;
+				}
+			}
+			if(!tagid){
+				return "No items tagged with:"+options.filterTag;
+			}
+			//console.log("Tags",tags);
 
-			const notes = await joplin.data.get(['tags',"ecedf7d6250d48e4a81faeaa0da0e74a",'notes']);
+			const notes = await joplin.data.get(['tags',tagid,'notes']);
 			console.log("Notes",notes);
 
 			html += "<table>";

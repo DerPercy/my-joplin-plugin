@@ -1,5 +1,5 @@
 //import { MyPlugin } from './MyPlugin.ts';
-
+const yaml = require('js-yaml');
 
 module.exports = {
     default: function(context) {
@@ -9,11 +9,17 @@ module.exports = {
 
 								function render(tokens, idx, _options, env, self) {
 
-									//console.log("render",tokens, idx, _options, env, self);
-
+									//console.log("render",tokens[idx].content);
+									let doc = {};
+									try {
+										doc = yaml.load(tokens[idx].content);
+										//console.log(doc);
+									} catch (e) {
+										return '<pre>'+e.message+'</pre>';
+									}
 									//return self.renderToken(tokens, idx, _options, env, self)
 									//MyPlugin.PluginClass.getInstance();
-									const uiOpt = btoa(JSON.stringify({
+									const uiOpt = btoa(JSON.stringify(doc));/*{
 										filterTag: "task",
 										columns: [
 											{ label: "Backlog"},
@@ -23,7 +29,7 @@ module.exports = {
 											{ label: "Wait", tag: "task.wait" },
 											{ label: "Done", tag: "task.done" }
 										]
-									}));
+									}));*/
 
 									const postMessageWithResponseTest = `
 						webviewApi.postMessage('${contentScriptId}', '${uiOpt}').then(function(response) {
@@ -63,8 +69,10 @@ module.exports = {
 										return false;
 									}*/
 
+									let fenceEndLine = startLine;
 									for(let i= startLine; i<= endLine; i++){
 										state.line = i+1;
+										fenceEndLine = i;
 										let iNewLineStart = state.bMarks[i] + state.tShift[i];
 										let iNewLineEnd = state.eMarks[i];
 										let newLineContent = state.src.slice(iNewLineStart,iNewLineEnd);
@@ -86,7 +94,7 @@ module.exports = {
 
 
 									token.info = "myParams"
-	 								token.content = state.getLines(startLine + 1, nextLine, len, true)
+	 								token.content = state.getLines(startLine + 1, fenceEndLine, len, true)
 	 								token.markup = "myMarkup"; // markup
 	 								token.map = [startLine, state.line]
 	 								return true
