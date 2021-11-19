@@ -4,7 +4,7 @@ import { MyPluginMethods } from './MyPluginMethods';
 export module MyPlugin {
 
 	export async function getHTMLCode(joplin, options){
-		let html = "<h1>Updated</h1>";
+		let html = "";
 		try{
 			const folders = await joplin.data.get(['folders']);
 			console.log("Folders",folders);

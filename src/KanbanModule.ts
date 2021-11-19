@@ -13,9 +13,13 @@ export module KanbanModule {
 		} catch (e) {
 			return '<pre>'+e.message+'</pre>';
 		}
-		//return self.renderToken(tokens, idx, _options, env, self)
-		//MyPlugin.PluginClass.getInstance();
-		const uiOpt = btoa(JSON.stringify(doc));
+		doc["type"] = "abc";
+		let message = {};
+		message["options"] = doc;
+		message["type"] = "html";
+		console.log("Message:",message);
+
+		const uiOpt = btoa(JSON.stringify(message));
 
 		const postMessageWithResponseTest = `
 			webviewApi.postMessage('${contentScriptId}', '${uiOpt}').then(function(response) {
@@ -34,9 +38,10 @@ export module KanbanModule {
 
 	export async function bindMessage(pJoplin){
 		const joplin = pJoplin;
-		const onMessage = async function (message:any){
-			const options = JSON.parse(atob(message));
-			const response = await MyPlugin.getHTMLCode(joplin, options);
+		const onMessage = async function (bMessage:any){
+			const message = JSON.parse(atob(bMessage));
+			console.log("MyMessage:",message);
+			const response = await MyPlugin.getHTMLCode(joplin, message.options);
 			//const response = await MyPlugin.getHTMLCode(options);
 			return response;
 		}
