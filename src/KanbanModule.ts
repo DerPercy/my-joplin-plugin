@@ -13,7 +13,6 @@ export module KanbanModule {
 		} catch (e) {
 			return '<pre>'+e.message+'</pre>';
 		}
-		doc["type"] = "abc";
 		let message = {};
 		message["options"] = doc;
 		message["type"] = "html";
@@ -31,7 +30,8 @@ export module KanbanModule {
 		return `
 			<div>
 				<div id="abcdef1234"></div>
-				<p><a href="#" onclick="${postMessageWithResponseTest.replace(/\n/g, ' ')}">Read/Update</a></p>
+				<p><a href="#" onclick="${postMessageWithResponseTest.replace(/\n/g, ' ')}">Refresh</a></p>
+				<style onload="${postMessageWithResponseTest.replace(/\n/g, ' ')}"></style>
 			</div>
 		`;
 	}
@@ -41,9 +41,30 @@ export module KanbanModule {
 		const onMessage = async function (bMessage:any){
 			const message = JSON.parse(atob(bMessage));
 			console.log("MyMessage:",message);
-			const response = await MyPlugin.getHTMLCode(joplin, message.options);
-			//const response = await MyPlugin.getHTMLCode(options);
-			return response;
+
+			if(message.type === "html"){
+				let uiOptions = {};
+				uiOptions["noteOnClick"] = function(note){
+					let message = {};
+					message["type"] = "opennote";
+					message["noteid"] = note.id;
+					const uiOpt = btoa(JSON.stringify(message));
+					const callMessage = `
+						webviewApi.postMessage('${contentScriptId}', '${uiOpt}').then(function(response) { });
+						return false;
+					`;
+					return callMessage;
+					//return "alert('Click: "+note.id+"')";
+				}
+				const response = await MyPlugin.getHTMLCode(joplin, message.options,uiOptions);
+				//const response = await MyPlugin.getHTMLCode(options);
+				return response;
+			}
+			if(message.type === "opennote"){
+				console.log("Open note",message.noteid);
+				joplin.commands.execute('openNote', message.noteid);
+				return {};
+			}
 		}
 		await joplin.contentScripts.onMessage(contentScriptId,onMessage);
 	}

@@ -3,7 +3,7 @@ import { MyPluginMethods } from './MyPluginMethods';
 
 export module MyPlugin {
 
-	export async function getHTMLCode(joplin, options){
+	export async function getHTMLCode(joplin, options, uiOptions){
 		let html = "";
 		try{
 			const folders = await joplin.data.get(['folders']);
@@ -39,7 +39,7 @@ export module MyPlugin {
 				for(let note of col){
 					//const noteTags = await joplin.data.get(['notes',note.id,'tags']);
 					//console.log("NoteTags",noteTags);
-					html += await renderNote(joplin, note);
+					html += await renderNote(joplin, note, uiOptions);
 				}
 				html += "</td>";
 			}
@@ -76,8 +76,13 @@ async function buildMatrix(joplin,notes,optColumns){
 	//return [notes.items,[],[],[]];
 }
 
-async function renderNote(joplin, note){
+async function renderNote(joplin, note, uiOptions){
 	const notedata = await joplin.data.get(['notes',note.id]);
 	console.log("Render note",notedata);
-	return "<div style='padding:10px; margin-bottom: 10px; border: 1px solid;'>"+notedata.title+"</div>";
+
+
+	const onClick = uiOptions.noteOnClick(note).replace(/\n/g, ' ');
+
+
+	return `<div style='padding:10px; margin-bottom: 10px; border: 1px solid;cursor:pointer;' onClick="${onClick}">${notedata.title}</div>`;
 }
