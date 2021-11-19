@@ -1,10 +1,10 @@
-import joplin from 'api';
+//import joplin from 'api';
 import { MyPluginMethods } from './MyPluginMethods';
 
 export module MyPlugin {
 
-	export async function getHTMLCode(options){
-		let html = "";
+	export async function getHTMLCode(joplin, options){
+		let html = "<h1>Updated</h1>";
 		try{
 			const folders = await joplin.data.get(['folders']);
 			console.log("Folders",folders);
@@ -33,13 +33,13 @@ export module MyPlugin {
 			}
 			html += "</tr>";
 			html += "<tr>";
-			const matrix = await buildMatrix(notes,options.columns);
+			const matrix = await buildMatrix(joplin,notes,options.columns);
 			for(let col of matrix){ // Content
 				html += "<td style='vertical-align:top'>";
 				for(let note of col){
 					//const noteTags = await joplin.data.get(['notes',note.id,'tags']);
 					//console.log("NoteTags",noteTags);
-					html += await renderNote(note);
+					html += await renderNote(joplin, note);
 				}
 				html += "</td>";
 			}
@@ -57,7 +57,7 @@ export module MyPlugin {
 /**
 returns [[{id:...},{},...],[...],...]
 */
-async function buildMatrix(notes,optColumns){
+async function buildMatrix(joplin,notes,optColumns){
 	console.log("OC",optColumns);
 	let matrix = MyPluginMethods.initColumns(optColumns);
 	for(let note of notes.items){
@@ -76,7 +76,7 @@ async function buildMatrix(notes,optColumns){
 	//return [notes.items,[],[],[]];
 }
 
-async function renderNote(note){
+async function renderNote(joplin, note){
 	const notedata = await joplin.data.get(['notes',note.id]);
 	console.log("Render note",notedata);
 	return "<div style='padding:10px; margin-bottom: 10px; border: 1px solid;'>"+notedata.title+"</div>";

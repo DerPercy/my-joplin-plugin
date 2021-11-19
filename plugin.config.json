@@ -3,6 +3,7 @@
 		"CodeMirrorExtension.ts",
 		"MarkdownItExtension.ts",
 		"MyPlugin.ts",
-		"MyPluginMethods.ts"
+		"MyPluginMethods.ts",
+		"KanbanModule.ts"
 	]
 }
