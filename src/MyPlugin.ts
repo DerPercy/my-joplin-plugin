@@ -29,7 +29,11 @@ export module MyPlugin {
 			html += "<table>";
 			html += "<tr>";
 			for(let col of options.columns){ // Header
-				html += "<th>"+col.label+"<br>("+col.tag+")</th>";
+				html += "<th>"+col.label;
+				if(col.tag){
+					html += "<br>("+col.tag+")";
+				}
+				html += "</th>";
 			}
 			html += "</tr>";
 			html += "<tr>";
@@ -84,5 +88,5 @@ async function renderNote(joplin, note, uiOptions){
 	const onClick = uiOptions.noteOnClick(note).replace(/\n/g, ' ');
 
 
-	return `<div style='padding:10px; margin-bottom: 10px; border: 1px solid;cursor:pointer;' onClick="${onClick}">${notedata.title}</div>`;
+	return `<div style='padding:10px; margin-bottom: 10px; border: 1px solid;cursor:pointer;' title="${notedata.title}" onClick="${onClick}">${notedata.title}</div>`;
 }
