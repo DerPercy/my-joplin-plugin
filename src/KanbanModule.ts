@@ -19,17 +19,18 @@ export module KanbanModule {
 		console.log("Message:",message);
 
 		const uiOpt = btoa(JSON.stringify(message));
+		const elmID = "mykanban-"+idx;
 
 		const postMessageWithResponseTest = `
 			webviewApi.postMessage('${contentScriptId}', '${uiOpt}').then(function(response) {
 				console.info('Got response in Markdown-it content script: ' + response);
-				document.getElementById('abcdef1234').innerHTML = response;
+				document.getElementById('${elmID}').innerHTML = response;
 			});
 			return false;
 		`;
 		return `
 			<div>
-				<div id="abcdef1234"></div>
+				<div id="${elmID}"></div>
 				<p><a href="#" onclick="${postMessageWithResponseTest.replace(/\n/g, ' ')}">Refresh</a></p>
 				<style onload="${postMessageWithResponseTest.replace(/\n/g, ' ')}"></style>
 			</div>

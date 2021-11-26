@@ -42,11 +42,11 @@ export module MyPluginMethods {
 	* noteTags: [{id,title},...]
 	* <= [1,3,4,5]
 	*/
-	export function getNoteColumns(optColumns,noteTags, skipEmptyCols = false){
+	export function getNoteColumns(columns,optColumns,noteTags, skipEmptyCols = false){
 		//throw new Error("This is an error");
 		let cols = [];
-		for(let i=0; i<optColumns.length;i++){
-			let col = optColumns[i];
+		for(let i=0; i<columns.length;i++){
+			let col = columns[i];
 			if(col.tag){
 				for(let tag of noteTags){
 					if(tag.title === col.tag){
@@ -55,7 +55,7 @@ export module MyPluginMethods {
 				}
 			} else { // col.tag not defined
 				if(!skipEmptyCols){
-					let namedColumns = getNoteColumns(optColumns,noteTags, true);
+					let namedColumns = getNoteColumns(optColumns,optColumns,noteTags, true);
 					if(namedColumns.length == 0){ // is not in a column with a tag
 						cols.push(i);
 					}
@@ -63,5 +63,33 @@ export module MyPluginMethods {
 			}
 		}
 		return cols;
+	}
+
+	/* Get
+	*
+	*/
+	export function getTablesFromOptions(options){
+		let tableIds = [];
+		let tables = [];
+		tables.push({});
+		for(let column of options.columns){
+			if(column.table){
+				if(!tableIds.includes(column.table)){
+					tables.push({ id: column.table });
+					tableIds.push(column.table);
+				}
+			}
+		}
+		return tables;
+	}
+
+	export function getColumnsOfTable(options,table){
+		let columns = [];
+		for(let col of options.columns){
+			if(col.table === table.id){ // could also be undefined
+				columns.push(col);
+			}
+		}
+		return columns;
 	}
 }
