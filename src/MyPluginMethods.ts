@@ -92,4 +92,42 @@ export module MyPluginMethods {
 		}
 		return columns;
 	}
+
+	// ========== date and time functions ========== //
+	export function getTimeDiff(timeInMillis, anchor = Date.now()){
+		let overdue = false;
+		let diff = 0;
+		if( timeInMillis > anchor){
+			overdue = true;
+			diff = timeInMillis - anchor;
+		} else {
+			diff = anchor - timeInMillis;
+		}
+		let ui = "";
+		if (diff < 1000) {
+			ui = diff+" ms";
+		}else {
+			let seconds = (diff / 1000) | 0;
+			ui = seconds + " sec";
+			if(seconds > 60){
+				let min = seconds / 60 | 0;
+				seconds = seconds % 60;
+				ui = min +" min "+ seconds + " sec";
+				if(min > 60){
+					let hours = min / 60 | 0;
+					min = min % 60;
+					ui = hours + " hours " + min + " min";
+					if( hours > 24){
+						let days = hours / 24 | 0;
+						hours = hours % 24;
+						ui = days + " days " + hours + " hours ";
+					}
+				}
+			}
+		}
+		return {
+			ui: ui,
+			overdue: overdue
+		}
+	}
 }

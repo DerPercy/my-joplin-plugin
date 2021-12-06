@@ -110,12 +110,30 @@ async function buildMatrix(joplin,notes,columns,optColumns){
 }
 
 async function renderNote(joplin, note, uiOptions){
-	const notedata = await joplin.data.get(['notes',note.id]);
+	const notedata = await joplin.data.get(['notes',note.id],{ fields: ['id', 'title','is_todo','todo_due','todo_completed'] });
+	/*
+	{	...
+    "is_todo": 1/0,
+    "todo_due": 0/1638385200000,
+    "todo_completed": 0/1638385200000,
+    ...
+	}
+	*/
 	console.log("Render note",notedata);
 
 
 	const onClick = uiOptions.noteOnClick(note).replace(/\n/g, ' ');
 
+	let uiCompleted = "";
+	if(notedata.todo_completed != 0){ // 0 = not completed
+		const timeInfoCompleted = MyPluginMethods.getTimeDiff(notedata.todo_completed);
+		uiCompleted = "<div style='font-style: italic;''>Done since "+timeInfoCompleted.ui+" </div>";
+	}
 
-	return `<div style='padding:10px; margin-bottom: 10px; border: 1px solid;cursor:pointer;' title="${notedata.title}" onClick="${onClick}">${notedata.title}</div>`;
+	return `
+		<div style='padding:10px; margin-bottom: 10px; border: 1px solid;cursor:pointer;' title="${notedata.title}" onClick="${onClick}">
+			${notedata.title}
+			${uiCompleted}
+		</div>
+	`;
 }
