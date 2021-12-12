@@ -104,6 +104,7 @@ export module MyPluginMethods {
 			diff = anchor - timeInMillis;
 		}
 		let ui = "";
+		let retDays = 0;
 		if (diff < 1000) {
 			ui = diff+" ms";
 		}else {
@@ -119,6 +120,7 @@ export module MyPluginMethods {
 					ui = hours + " hours " + min + " min";
 					if( hours > 24){
 						let days = hours / 24 | 0;
+						retDays = days;
 						hours = hours % 24;
 						ui = days + " days " + hours + " hours ";
 					}
@@ -127,6 +129,7 @@ export module MyPluginMethods {
 		}
 		return {
 			ui: ui,
+			days: retDays,
 			overdue: overdue
 		}
 	}
